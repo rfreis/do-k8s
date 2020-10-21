@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: polls
+  labels:
+    app: polls
+spec:
+  # type: NodePort
+  type: ClusterIP
+  selector:
+    app: polls
+  ports:
+    - port: 8000
+      targetPort: 8000

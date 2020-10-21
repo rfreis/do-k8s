@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: polls-app
+  labels:
+    app: polls
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: polls
+  template:
+    metadata:
+      labels:
+        app: polls
+    spec:
+      containers:
+        - image: registry.digitalocean.com/rfreis/polls:latest
+          name: polls
+          envFrom:
+          - secretRef:
+              name: polls-secret
+          - configMapRef:
+              name: polls-config
+          ports:
+            - containerPort: 8000
+              name: gunicorn
