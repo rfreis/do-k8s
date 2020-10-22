@@ -50,6 +50,13 @@ $ kubectl apply -f yaml/polls-ingress.yaml
 $ kubectl apply -f yaml/polls-svc.yaml --force
 ```
 
+## redis and kafka
+
+```
+$ kubectl apply -f yaml/redis.yaml
+$ kubectl apply -f yaml/kafka.yaml
+```
+
 # checking items
 
 ```
@@ -79,4 +86,10 @@ $ kubectl get pods --namespace cert-manager
 ```
 $ kubectl describe ingress polls-ingress
 $ wget -O - http://polls.dochaus.app/polls
+```
+
+## deleting secret
+
+```
+$ kubectl delete secret polls-secret
 ```

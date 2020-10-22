@@ -1,0 +1,150 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zookeeper-app
+  labels:
+    app: zookeeper
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zookeeper
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      containers:
+      - image: zookeeper:3.4.9
+        name: zookeeper
+        envFrom:
+            - secretRef:
+                name: polls-secret
+            - configMapRef:
+                name: polls-config
+        ports:
+        - containerPort: 2181
+          name: zookeeper
+        volumeMounts:
+        - name: zookeeper-persistent-storage
+          mountPath: /var/lib/zookeeper
+      volumes:
+      - name: zookeeper-persistent-storage
+        persistentVolumeClaim:
+          claimName: zookeeper-pv-claim
+
+---
+    
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: zookeeper-pv-claim
+  labels:
+    app: zookeeper
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi    
+
+---
+    
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper-service
+  labels:
+    app: zookeeper-service
+spec:
+  # type: NodePort
+  ports:
+    - port: 2181
+  selector:
+    app: zookeeper
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-app
+  labels:
+    app: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      containers:
+      - image: confluentinc/cp-kafka:5.5.0
+        name: kafka
+        envFrom:
+            - secretRef:
+                name: polls-secret
+            - configMapRef:
+                name: polls-config
+        ports:
+        - containerPort: 9092
+          name: kafka
+        volumeMounts:
+        - name: kafka-persistent-storage
+          mountPath: /var/lib/kafka
+      volumes:
+      - name: kafka-persistent-storage
+        persistentVolumeClaim:
+          claimName: kafka-pv-claim
+
+---
+    
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kafka-pv-claim
+  labels:
+    app: kafka
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi    
+
+---
+    
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-service
+  labels:
+    app: kafka-service
+spec:
+  # type: NodePort
+  ports:
+    - port: 9092
+  selector:
+    app: kafka
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-service-external
+  labels:
+    app: kafka-service-external
+spec:
+  type: NodePort
+  ports:
+    - port: 9093
+  selector:
+    app: kafka
