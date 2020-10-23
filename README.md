@@ -6,6 +6,7 @@ Tutorial for develop Django with Kubernetes following the article from [Digital 
 
 ```
 $ doctl registry login
+$ docker build -t polls .
 $ docker tag <my-image> registry.digitalocean.com/<my-registry>/<my-image>
 $ docker push registry.digitalocean.com/<my-registry>/<my-image>
 ```
